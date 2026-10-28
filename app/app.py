@@ -3,6 +3,7 @@
 Every flaw marked PLANTED was added on purpose so the scanners have something
 to find. Fictional data only. Never deploy this anywhere.
 """
+import html
 import sqlite3
 
 from flask import Flask, request
@@ -49,8 +50,7 @@ def flight():
 @app.route("/search")
 def search():
     q = request.args.get("q", "")
-    # PLANTED: reflected XSS (user input returned as HTML without escaping)
-    return "<h2>Results for " + q + "</h2>"
+    return "<h2>Results for " + html.escape(q) + "</h2>"
 
 
 if __name__ == "__main__":
