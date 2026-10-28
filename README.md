@@ -9,7 +9,7 @@ A small DevSecOps lab: a deliberately vulnerable Flask app, a GitHub Actions pip
 Work in progress. Nothing below is claimed until it has run and the result is in this repo.
 
 - [x] App, Dockerfile, and pipeline written
-- [ ] First pipeline run green on GitHub Actions
+- [x] First pipeline run green on GitHub Actions (2026-10-28)
 - [ ] Baseline findings recorded (before counts)
 - [ ] 3 to 5 findings fixed and rescanned (after counts)
 - [ ] NIST SP 800-53 mapping
