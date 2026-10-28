@@ -4,6 +4,7 @@ Every flaw marked PLANTED was added on purpose so the scanners have something
 to find. Fictional data only. Never deploy this anywhere.
 """
 import html
+import os
 import sqlite3
 
 from flask import Flask, request
@@ -54,5 +55,5 @@ def search():
 
 
 if __name__ == "__main__":
-    # PLANTED: debug mode on and listening on all interfaces
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    # Debug stays off. Listen on localhost unless the container sets FLASK_HOST.
+    app.run(host=os.environ.get("FLASK_HOST", "127.0.0.1"), port=5000, debug=False)
