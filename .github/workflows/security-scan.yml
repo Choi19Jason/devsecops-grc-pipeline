@@ -1,0 +1,109 @@
+name: security-scan
+
+# Three scanners, one workflow. Findings never fail the build in this lab
+# (exit-code 0 / fail_action false): the goal is to collect and triage them.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 13 * * 1" # Mondays, recurring scan (NIST RA-5)
+
+permissions:
+  contents: read
+
+# Every third-party action is pinned to a full commit SHA, not a tag.
+# Reason: in March 2026 attackers force-pushed 76 of 77 aquasecurity/trivy-action
+# version tags to malicious code. A SHA cannot be moved; a tag can.
+jobs:
+  trivy:
+    name: Trivy (dependencies, secrets, IaC, image)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write # needed to upload SARIF to the Security tab
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Trivy filesystem scan
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          scanners: vuln,secret,misconfig
+          format: sarif
+          output: trivy-fs.sarif
+          exit-code: "0"
+
+      - name: Upload filesystem results
+        if: always()
+        uses: github/codeql-action/upload-sarif@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
+        with:
+          sarif_file: trivy-fs.sarif
+          category: trivy-fs
+
+      - name: Build image
+        run: docker build -t flightdesk:ci .
+
+      - name: Trivy image scan
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: image
+          image-ref: flightdesk:ci
+          format: sarif
+          output: trivy-image.sarif
+          exit-code: "0"
+
+      - name: Upload image results
+        if: always()
+        uses: github/codeql-action/upload-sarif@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
+        with:
+          sarif_file: trivy-image.sarif
+          category: trivy-image
+
+  codeql:
+    name: CodeQL (SAST)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: github/codeql-action/init@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
+        with:
+          languages: python
+          build-mode: none
+
+      - uses: github/codeql-action/analyze@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
+        with:
+          category: codeql-python
+
+  zap-baseline:
+    name: OWASP ZAP baseline (DAST, passive)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Build and start the app
+        run: |
+          docker build -t flightdesk:ci .
+          docker run -d --name flightdesk -p 5000:5000 flightdesk:ci
+          for i in $(seq 1 30); do
+            curl -fs http://localhost:5000/health && exit 0
+            sleep 1
+          done
+          docker logs flightdesk
+          exit 1
+
+      - name: ZAP baseline scan
+        uses: zaproxy/action-baseline@de8ad967d3548d44ef623df22cf95c3b0baf8b25 # v0.15.0
+        with:
+          target: http://localhost:5000
+          allow_issue_writing: false
+          fail_action: false
+          artifact_name: zap-baseline-report
