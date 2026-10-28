@@ -39,13 +39,10 @@ def health():
 @app.route("/flight")
 def flight():
     number = request.args.get("number", "")
-    # PLANTED: SQL injection (query built by string concatenation)
-    query = (
-        "SELECT number, origin, destination, status FROM flights WHERE number = '"
-        + number
-        + "'"
-    )
-    rows = conn.execute(query).fetchall()
+    rows = conn.execute(
+        "SELECT number, origin, destination, status FROM flights WHERE number = ?",
+        (number,),
+    ).fetchall()
     return {"results": rows}
 
 

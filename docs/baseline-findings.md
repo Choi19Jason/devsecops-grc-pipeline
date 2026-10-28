@@ -17,7 +17,7 @@
 
 Dependabot severity split was not recorded; the visible rows were High and Moderate.
 
-**Read the 206 Trivy alerts with care.** They mix findings in the app's pinned dependencies (Flask, Werkzeug, Jinja2), the base image's own tooling (pip), and Debian operating-system packages in the `python:3.12-slim` base image (util-linux, tar, perl, and others). I planted only the dependency pins and the Dockerfile settings. The OS-package count changes whenever the base image is rebuilt. Breakdown by file: [to fill in after checking `path:Dockerfile` and `path:app/requirements.txt`].
+**Read the 206 Trivy alerts with care.** They mix findings in the app's pinned dependencies (Flask, Werkzeug, Jinja2), the base image's own tooling (pip), and Debian operating-system packages in the `python:3.12-slim` base image (util-linux, tar, perl, and others). I planted only the dependency pins and the Dockerfile settings. The OS-package count changes whenever the base image is rebuilt. Breakdown by location: 17 in `app/requirements.txt` (filesystem scan), 2 in `Dockerfile` (misconfiguration), and the remaining 187 in the built image (OS packages, the image's `pip`, and the same three libraries again). The 17 matches Dependabot's 17. None are in `app/app.py`.
 
 ## Which planted flaw did each tool catch?
 
@@ -26,9 +26,9 @@ Dependabot severity split was not recorded; the visible rows were High and Moder
 | SQL injection (`app/app.py`) | Caught (#209, line 48) | n/a | Missed (passive scan sends no payloads) | n/a |
 | Reflected XSS (`app/app.py`) | Caught (#208, line 56) | n/a | Missed (passive scan) | n/a |
 | Flask debug mode (`app/app.py`) | Caught (#207, line 61) | n/a | Not flagged directly | n/a |
-| Hardcoded `secret_key` (`app/app.py`) | Missed | [to confirm] | n/a | n/a |
+| Hardcoded `secret_key` (`app/app.py`) | Missed | Missed (0 Trivy alerts on `app/app.py`) | n/a | n/a |
 | Outdated dependency pins | n/a | Caught (Flask, Werkzeug, Jinja2 in the image) | Not flagged | Caught (17) |
-| Container runs as root, no HEALTHCHECK | n/a | [to confirm] | n/a | n/a |
+| Container runs as root, no HEALTHCHECK | n/a | Caught (#18 root user, High; #19 no HEALTHCHECK, Low) | n/a | n/a |
 | Missing security headers | n/a | n/a | Caught (CSP, anti-clickjacking, nosniff, and others) | n/a |
 
 ## What ZAP baseline reported

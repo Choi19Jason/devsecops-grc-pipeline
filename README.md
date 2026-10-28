@@ -10,7 +10,7 @@ Work in progress. Nothing below is claimed until it has run and the result is in
 
 - [x] App, Dockerfile, and pipeline written
 - [x] First pipeline run green on GitHub Actions (2026-10-28)
-- [ ] Baseline findings recorded (before counts)
+- [x] Baseline findings recorded (before counts): `docs/baseline-findings.md`
 - [ ] 3 to 5 findings fixed and rescanned (after counts)
 - [ ] NIST SP 800-53 mapping
 - [ ] Architecture diagram
