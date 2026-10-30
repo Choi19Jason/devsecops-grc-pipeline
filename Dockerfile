@@ -4,6 +4,8 @@ WORKDIR /app
 RUN pip install --no-cache-dir --upgrade pip
 COPY app/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+# The app does not need pip at runtime, so remove it (and the libraries it bundles)
+RUN pip uninstall -y pip
 COPY app/ .
 
 RUN useradd --create-home --uid 10001 appuser
