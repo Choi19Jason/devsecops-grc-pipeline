@@ -53,7 +53,6 @@ flowchart TD
     end
 
     results --> triage["Triage and fix: docs/before-and-after.md"]
-    triage -->|commit and push| dev
     triage --> grc["GRC layer: docs/nist-800-53-mapping.md"]
 ```
 
