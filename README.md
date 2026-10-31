@@ -13,7 +13,7 @@ Work in progress. Nothing below is claimed until it has run and the result is in
 - [x] Baseline findings recorded (before counts): `docs/baseline-findings.md`
 - [x] Fixes made and rescanned, after counts recorded (5 planned fixes plus 1 follow-up): `docs/before-and-after.md`
 - [x] NIST SP 800-53 mapping, first version (control titles verified, judgments under review): `docs/nist-800-53-mapping.md`
-- [ ] Architecture diagram
+- [x] Architecture diagram (renders on GitHub, 2026-10-31)
 
 ## Results
 
@@ -32,28 +32,29 @@ The 164 that remain are operating-system packages in the base image, which I did
 ## Architecture
 
 ```mermaid
-flowchart LR
-    dev["Your PC<br/>VS Code, git"] -->|git push| repo["GitHub repo<br/>app/, Dockerfile, docs/"]
-    repo -->|"push to main, Monday cron"| trivy
-    repo --> codeql
-    repo --> zap
+flowchart TD
+    dev["Your PC: VS Code, git"] -->|git push| repo["GitHub repo: app/, Dockerfile, docs/"]
+    repo --> actions
 
-    subgraph actions["GitHub Actions: security-scan.yml"]
-        trivy["Trivy<br/>files, dependencies,<br/>Dockerfile, image"]
-        codeql["CodeQL<br/>Python source (SAST)"]
-        zap["OWASP ZAP baseline<br/>passive scan of the<br/>running container (DAST)"]
+    subgraph actions["GitHub Actions: security-scan.yml (every push to main, Monday cron)"]
+        direction LR
+        trivy["Trivy: files, dependencies, Dockerfile, image"]
+        codeql["CodeQL: Python source (SAST)"]
+        zap["OWASP ZAP baseline: passive scan of the running container (DAST)"]
     end
 
-    trivy -->|SARIF| tab["Security tab<br/>code scanning alerts"]
-    codeql -->|results| tab
-    zap -->|HTML, JSON, Markdown| art["Workflow artifact<br/>ZAP report"]
-    repo -.->|dependency graph| dep["Dependabot alerts"]
+    actions --> results
 
-    tab --> triage["Triage and fix<br/>docs/before-and-after.md"]
-    art --> triage
-    dep --> triage
+    subgraph results["Where findings land"]
+        direction LR
+        tab["Security tab: Trivy and CodeQL alerts"]
+        art["Workflow artifact: ZAP report"]
+        dep["Dependabot alerts"]
+    end
+
+    results --> triage["Triage and fix: docs/before-and-after.md"]
     triage -->|commit and push| dev
-    triage --> grc["GRC layer<br/>docs/nist-800-53-mapping.md"]
+    triage --> grc["GRC layer: docs/nist-800-53-mapping.md"]
 ```
 
 A change is pushed to GitHub, the three scan jobs run in GitHub Actions, and their findings land in the Security tab (Trivy, CodeQL), a downloadable artifact (ZAP) and Dependabot alerts. I triage the findings, fix the code, and push again. The GRC layer maps the controls this loop exercises to NIST SP 800-53.
