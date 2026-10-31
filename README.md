@@ -11,9 +11,23 @@ Work in progress. Nothing below is claimed until it has run and the result is in
 - [x] App, Dockerfile, and pipeline written
 - [x] First pipeline run green on GitHub Actions (2026-10-28)
 - [x] Baseline findings recorded (before counts): `docs/baseline-findings.md`
-- [ ] 3 to 5 findings fixed and rescanned (after counts): 3 done so far (SQL injection, XSS, debug mode)
+- [x] Fixes made and rescanned, after counts recorded (5 planned fixes plus 1 follow-up): `docs/before-and-after.md`
 - [ ] NIST SP 800-53 mapping
 - [ ] Architecture diagram
+
+## Results
+
+Scanned at tag `v0-baseline` (2026-10-28) and again at `v1-fixed` (2026-10-30). Details and fix log: `docs/before-and-after.md`.
+
+| Source | Before | After |
+|---|---|---|
+| CodeQL (app code) | 3 | 0 |
+| Trivy, my own files (`requirements.txt`, `Dockerfile`) | 19 | 0 |
+| Dependabot | 17 | 0 |
+| Trivy, built image | 187 | 164 |
+| Code scanning total (CodeQL + Trivy) | 209 | 164 |
+
+The 164 that remain are operating-system packages in the base image, which I did not plant and treat as accepted risk for this lab. Not fixed: the hardcoded `secret_key` (neither CodeQL nor Trivy flagged it) and the 9 ZAP header alerts. One of my fixes (upgrading pip) briefly added about 8 new alerts from pip's bundled libraries; removing pip from the final image closed them.
 
 ## What each tool does
 
