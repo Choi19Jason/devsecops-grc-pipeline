@@ -12,7 +12,7 @@ Work in progress. Nothing below is claimed until it has run and the result is in
 - [x] First pipeline run green on GitHub Actions (2026-10-28)
 - [x] Baseline findings recorded (before counts): `docs/baseline-findings.md`
 - [x] Fixes made and rescanned, after counts recorded (5 planned fixes plus 1 follow-up): `docs/before-and-after.md`
-- [ ] NIST SP 800-53 mapping
+- [x] NIST SP 800-53 mapping, first version (control titles verified, judgments under review): `docs/nist-800-53-mapping.md`
 - [ ] Architecture diagram
 
 ## Results
