@@ -31,30 +31,7 @@ The 164 that remain are operating-system packages in the base image, which I did
 
 ## Architecture
 
-```mermaid
-flowchart TD
-    dev["Your PC: VS Code, git"] -->|git push| repo["GitHub repo: app/, Dockerfile, docs/"]
-    repo --> actions
-
-    subgraph actions["GitHub Actions: security-scan.yml (every push to main, Monday cron)"]
-        direction LR
-        trivy["Trivy: files, dependencies, Dockerfile, image"]
-        codeql["CodeQL: Python source (SAST)"]
-        zap["OWASP ZAP baseline: passive scan of the running container (DAST)"]
-    end
-
-    actions --> results
-
-    subgraph results["Where findings land"]
-        direction LR
-        tab["Security tab: Trivy and CodeQL alerts"]
-        art["Workflow artifact: ZAP report"]
-        dep["Dependabot alerts"]
-    end
-
-    results --> triage["Triage and fix: docs/before-and-after.md"]
-    triage --> grc["GRC layer: docs/nist-800-53-mapping.md"]
-```
+![Architecture of the devsecops-grc-pipeline: your PC pushes to GitHub, GitHub Actions runs Trivy, CodeQL and OWASP ZAP while Dependabot watches the dependency list, findings land in the Security tab, a ZAP report and Dependabot alerts, then feed triage and fixes, which loop back to your PC and feed the GRC layer.](docs/architecture.svg)
 
 A change is pushed to GitHub, the three scan jobs run in GitHub Actions, and their findings land in the Security tab (Trivy, CodeQL), a downloadable artifact (ZAP) and Dependabot alerts. I triage the findings, fix the code, and push again. The GRC layer maps the controls this loop exercises to NIST SP 800-53.
 
