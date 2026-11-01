@@ -10,7 +10,7 @@ import sqlite3
 from flask import Flask, request
 
 app = Flask(__name__)
-app.secret_key = "flightdesk-dev-secret"  # PLANTED: hardcoded secret
+app.secret_key = os.environ.get("FLASK_SECRET_KEY") or os.urandom(32).hex()
 
 conn = sqlite3.connect(":memory:", check_same_thread=False)
 conn.execute("CREATE TABLE flights (number TEXT, origin TEXT, destination TEXT, status TEXT)")
