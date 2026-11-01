@@ -1,7 +1,8 @@
-"""FlightDesk: a deliberately vulnerable demo app for a DevSecOps pipeline lab.
+"""FlightDesk: a demo app for a DevSecOps pipeline lab.
 
-Every flaw marked PLANTED was added on purpose so the scanners have something
-to find. Fictional data only. Never deploy this anywhere.
+It started with flaws planted on purpose so the scanners had something to find
+(tag v0-baseline); this version has the fixes. Fictional data only. Never
+deploy this anywhere.
 """
 import html
 import os

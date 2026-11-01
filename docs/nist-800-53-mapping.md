@@ -17,7 +17,7 @@ This maps what the pipeline and the fixes in this repo actually do to NIST SP 80
 | AC-6 | Least Privilege | Container runs as the non-root user `appuser`; the workflow token has `contents: read` by default and `security-events: write` only on jobs that upload results | `Dockerfile`; `permissions` blocks in `security-scan.yml` | Implemented for the container and the CI token |
 | SI-10 | Information Input Validation | `/flight` uses a parameterized SQL query; `/search` escapes user input before returning HTML | `app/app.py`; CodeQL alerts #209 and #208 closed | Partial. Closest fit: escaping is output encoding, and inputs are not validated for format |
 | SI-11 | Error Handling | Debug mode is off, so users do not get the interactive debugger or stack traces | `app/app.py`; CodeQL alert #207 closed | Partial. No custom error pages |
-| IA-5(7) | No Embedded Unencrypted Static Authenticators | Not addressed: `app.secret_key` is still hardcoded in source | `app/app.py` | **Missing.** Closest fit; neither CodeQL nor Trivy flagged it |
+| IA-5(7) | No Embedded Unencrypted Static Authenticators | Fix 7: `app.secret_key` is read from the `FLASK_SECRET_KEY` environment variable, with a random per-start key as the fallback, so no secret sits in source | `app/app.py` line 13 (commit `930deb9`) | Partial. Closest fit; neither CodeQL nor Trivy flagged the original, so this is proven by code review, not a closed alert. No secrets manager, and the key is not set in the image, so each container start uses a new random key |
 | SR-3 | Supply Chain Controls and Processes | Every GitHub Action pinned to a full commit SHA after the March 2026 compromise of `aquasecurity/trivy-action` tags; Dependabot watches dependencies | Pins and comment in `security-scan.yml`; Dependabot alerts page | Partial. No SBOM and no signature verification |
 | SA-10 | Developer Configuration Management | Git history with one change per commit and tags `v0-baseline` and `v1-fixed` marking before and after | `git log`, repo tags | Implemented. One person, no branch protection or review |
 | CA-7 | Continuous Monitoring | Scans run on every push and weekly | `schedule` cron in `security-scan.yml` | Partial. Alerts go to the Security tab only, with no owner or notification |
@@ -25,7 +25,7 @@ This maps what the pipeline and the fixes in this repo actually do to NIST SP 80
 | RA-3 | Risk Assessment | Findings triaged by location (own files vs base image) and severity | `docs/before-and-after.md` | Partial. No impact or likelihood rating and no risk register |
 
 ## Gaps this mapping exposes
-- Hardcoded `secret_key` (IA-5(7)): no scanner caught it, and it is not fixed.
+- Hardcoded `secret_key` (IA-5(7)): no scanner caught it. Fixed in Fix 7, but only a code review shows that; there is still no secrets manager.
 - Security headers (CM-6): 9 ZAP alerts open.
 - A formal POA&M and risk register (CA-5, RA-3): planned for Tier 2.
 - Alert ownership and remediation deadlines (SI-2, CA-7): not defined.

@@ -33,11 +33,13 @@ The remaining 164 open alerts are all Trivy findings in the built image. Every r
 | 5. Dockerfile: non-root user, HEALTHCHECK, newer pip | `8a45aaa` | Trivy alerts #18 (root user) and #19 (no HEALTHCHECK) closed |
 | 6. Remove pip from the final image | `759a57f` | About 8 new alerts closed (see below) |
 
+## Fix 7: the flaw no scanner found
+After `v1-fixed`, commit `930deb9` replaced the hardcoded `app.secret_key` with `os.environ.get("FLASK_SECRET_KEY") or os.urandom(32).hex()`. Neither CodeQL nor Trivy flagged the original, so no closed alert proves it. The proof is the diff in that commit. Limits: the key is not set in the image, so each container start generates a new random key (fine for a lab app, a problem for sessions that must survive restarts), and there is no secrets manager. The counts above were taken before this commit and are not re-recorded.
+
 ## A fix that created new findings
 Fix 5 upgraded pip. The newer pip bundles its own copies of urllib3, msgpack and setuptools, and Trivy flagged them: about 8 new alerts appeared (numbers #210 to #216 identified). Those libraries are build tools the app never uses at runtime. Fix 6 removed pip from the final image. The arithmetic fits: 214 Trivy alerts were ever opened (206 plus 8 new), 164 are open, and all 164 are original baseline image alerts.
 
 ## What is not fixed
-- **Hardcoded `secret_key` in `app/app.py`.** Neither CodeQL nor Trivy flagged it, so no scanner proves a fix. This is a detection gap. The fix is to read the key from an environment variable.
 - **ZAP baseline alerts (9).** Missing security headers (CSP, anti-clickjacking, nosniff, and others). Not addressed in this sprint.
 - **Base-image OS packages (164).** See below.
 
