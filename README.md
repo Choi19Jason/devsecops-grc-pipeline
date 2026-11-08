@@ -6,7 +6,7 @@
 ![scanners](https://img.shields.io/badge/scanners-Trivy%20%7C%20CodeQL%20%7C%20ZAP%20%7C%20Dependabot-6f42c1)
 ![NIST](https://img.shields.io/badge/NIST%20800--53-14%20controls%20mapped-orange)
 
-A small DevSecOps lab: a Flask app I wrote with security flaws planted on purpose, a GitHub Actions pipeline that scans it four ways, and a GRC layer that maps the pipeline to NIST SP 800-53. The loop is **scan, triage, fix, rescan, document**.
+A small DevSecOps lab: a small Flask app (first version written with Claude Code) with security flaws planted on purpose, a GitHub Actions pipeline that scans it four ways, and a GRC layer that maps the pipeline to NIST SP 800-53. The loop is **scan, triage, fix, rescan, document**.
 
 **Author:** Joonwoo "Jason" Choi, CIT at Purdue (Class of 2028), targeting Summer 2027 AppSec, GRC and security internships.
 
@@ -74,7 +74,7 @@ A change is pushed to GitHub, the three scan jobs run in GitHub Actions, and the
 
 - This uses Trivy, the open-source scanner from Aqua Security. It does not use Aqua's commercial platform. I have not used SonarQube, Jira, XBOW or Traceable.
 - ZAP baseline is passive: it does not attack the app, so it will not find the SQL injection. CodeQL covers that.
-- The target is a toy app I wrote, not production code. Finding counts show that the pipeline works, not how secure a real system is.
+- The target is a small demo app, not production code. Finding counts show that the pipeline works, not how secure a real system is.
 - The NIST mapping is a learning exercise, not a compliance assessment. Rows marked "closest fit" are debatable.
 
 ## How I built this
