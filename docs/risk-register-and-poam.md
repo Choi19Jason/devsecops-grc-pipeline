@@ -22,6 +22,8 @@ This is a learning exercise on a toy app. It is not a formal risk assessment, an
 | R-13 | Detection gaps: the scanners miss some flaw types, so a flaw can sit unseen | `docs/baseline-findings.md`: CodeQL and Trivy missed the hardcoded secret key; passive ZAP sends no payloads, so it does not test injection | 2 | 2 | 4 | Medium | Mitigate (P-03) | Open |
 | R-14 | No governance around findings: no branch protection or required review, no alert notification, no remediation deadlines | NIST mapping rows SA-10, CA-7, SI-2 (marked Partial) | 2 | 1 | 2 | Low | Mitigate (P-04) | Open |
 | R-15 | No software bill of materials (SBOM) and no image signature check, so I cannot list or verify exactly what the image contains | NIST mapping row SR-3 (Partial) | 1 | 2 | 2 | Low | Mitigate (P-05) | Open |
+| R-16 | Fail-open pipeline: when the app fails its health check, the ZAP scan is skipped and the run still passes, so code could ship without that scan | `.github/workflows/security-scan.yml`; skip tested on run #18 (2026-11-07). The skip is visible (warning, run summary), but a skipped scan does not fail the build | 1 | 2 | 2 | Low | Partly mitigated (skip made visible, 2026-11-07); decide with P-04 whether a skip should block a merge | Open |
+| R-17 | The workflow uses the moving runner label `ubuntu-latest`. GitHub's run notices say the label will move to Ubuntu 26, so a scan can behave differently with no change from me | Notices on runs #18 and #19 | 2 | 1 | 2 | Low | Mitigate (P-06) | Open |
 
 ## 2. Closed risks (kept as evidence)
 
@@ -44,14 +46,16 @@ Status key: Not started, In progress, Done. All dates are my own targets. Today 
 | P-01 | R-08 | Base-image OS packages with known CVEs; floating image tag lets the count move without a code change | SI-2, RA-5, CM-6 | 1. Pin the base image to a digest in the `Dockerfile`. 2. Rebuild and rescan; record the count with its date. 3. Open a sample of alerts and note how many have a vendor fix. 4. Decide per alert group: patch by rebuilding or accept. 5. Document the rebuild cadence (weekly cron already exists) | Docker Hub image digest; Trivy alert pages | Jason | 2026-11-04 | Not started |
 | P-02 | R-09, R-10, R-11, R-12 | Missing security headers, version leak, cacheable responses | CM-6, SI-2 | 1. Add the headers in the Flask app: Content-Security-Policy, frame protection, `X-Content-Type-Options: nosniff`, Permissions-Policy, Cross-Origin-Opener, Embedder and Resource policies, `Cache-Control`. 2. Suppress or genericize the `Server` header (may need a change to how the app is served). 3. Rerun the ZAP baseline and record the after count. 4. Update the mapping row for CM-6 | Flask docs, OWASP Secure Headers guidance, ZAP baseline job | Jason | 2026-11-05 | Not started |
 | P-03 | R-13 | Scanners miss some flaw types | SA-11, RA-5 | 1. Add SonarQube Cloud beside CodeQL and compare results on the same app. 2. Consider a ZAP full scan against my own local container only, never a third-party site. 3. Update the detection table in `docs/baseline-findings.md` with the new tool columns | SonarQube Cloud free tier (needs an account I create), ZAP | Jason | 2026-11-08 | Not started |
-| P-04 | R-14 | No branch protection, no alert owner, notification or deadline | SA-10, CA-7, SI-2 | 1. Turn on branch protection for `main` (require pull requests and passing scan jobs). 2. Turn on email notifications for new alerts. 3. Write remediation targets: Critical 7 days, High 30, Medium 90, Low best effort (my own lab targets, not an industry standard) | GitHub repository settings | Jason | 2026-11-08 | Not started |
+| P-04 | R-14, R-16 | No branch protection, no alert owner, notification or deadline | SA-10, CA-7, SI-2 | 1. Turn on branch protection for `main` (require pull requests and passing scan jobs). 2. Turn on email notifications for new alerts. 3. Write remediation targets: Critical 7 days, High 30, Medium 90, Low best effort (my own lab targets, not an industry standard). 4. Decide whether a skipped scan should fail the build (R-16); if yes, add a final job that fails when ZAP was skipped | GitHub repository settings | Jason | 2026-11-08 | Not started |
 | P-05 | R-15 | No SBOM and no image signing | SR-3 | 1. Have Trivy generate a CycloneDX SBOM and keep it as a workflow artifact. 2. Note image signing (for example Sigstore cosign) as a later step | Trivy | Jason | 2026-11-15 | Not started |
+| P-06 | R-17 | Moving runner label | CM-6, SI-2 | 1. Check GitHub's list of runner images and pick a fixed Ubuntu version. 2. Change `runs-on: ubuntu-latest` to that version in all three jobs. 3. Confirm a green run and record the date | GitHub runner image list | Jason | 2026-11-15 | Not started |
 
 ## 4. Review log
 
 | Date | What changed |
 |---|---|
 | 2026-11-01 | First version. 15 risks recorded: 7 closed, 8 open, tracked by 5 POA&M items |
+| 2026-11-07 | Added R-16 (fail-open skip) and R-17 (moving runner label) and POA&M item P-06. The health-check skip (commit `38f5334`) partly mitigates R-16. 17 risks: 7 closed, 10 open, tracked by 6 POA&M items |
 
 Next review: 2026-11-08, or sooner if a weekly scan shows new alerts.
 

@@ -51,7 +51,8 @@ A change is pushed to GitHub, the three scan jobs run in GitHub Actions, and the
 - [x] Fixes made and rescanned, after counts recorded (6 fixes plus Fix 7 for the secret key): [docs/before-and-after.md](docs/before-and-after.md)
 - [x] NIST SP 800-53 mapping, first version (control titles verified, judgments under review): [docs/nist-800-53-mapping.md](docs/nist-800-53-mapping.md)
 - [x] Architecture diagram
-- [x] Risk register and POA&M, first version (15 risks, 5 open action items, none started): [docs/risk-register-and-poam.md](docs/risk-register-and-poam.md)
+- [x] Risk register and POA&M, first version (17 risks, 6 open action items, none started): [docs/risk-register-and-poam.md](docs/risk-register-and-poam.md)
+- [x] Health check: the ZAP scan is skipped, with a warning and a run-summary line, when the app fails `/health` (tested 2026-11-07): [docs/health-check-skip.md](docs/health-check-skip.md)
 - [ ] Next: pin the base image to a digest, security headers for the ZAP alerts, SonarQube beside CodeQL, an API test against the OWASP API Top 10
 
 ## What each tool does
