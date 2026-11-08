@@ -21,13 +21,13 @@ This maps what the pipeline and the fixes in this repo actually do to NIST SP 80
 | SR-3 | Supply Chain Controls and Processes | Every GitHub Action pinned to a full commit SHA after the March 2026 compromise of `aquasecurity/trivy-action` tags; Dependabot watches dependencies | Pins and comment in `security-scan.yml`; Dependabot alerts page | Partial. No SBOM and no signature verification |
 | SA-10 | Developer Configuration Management | Git history with one change per commit and tags `v0-baseline` and `v1-fixed` marking before and after | `git log`, repo tags | Implemented. One person, no branch protection or review |
 | CA-7 | Continuous Monitoring | Scans run on every push and weekly | `schedule` cron in `security-scan.yml` | Partial. Alerts go to the Security tab only, with no owner or notification |
-| CA-5 | Plan of Action and Milestones | "What is not fixed" and "Accepted risk" sections track open items | `docs/before-and-after.md` | Partial. Not a formal POA&M (no owner, due date or milestone per item) |
-| RA-3 | Risk Assessment | Findings triaged by location (own files vs base image) and severity | `docs/before-and-after.md` | Partial. No impact or likelihood rating and no risk register |
+| CA-5 | Plan of Action and Milestones | "What is not fixed" and "Accepted risk" sections track open items | `docs/before-and-after.md`, `docs/risk-register-and-poam.md` | Partial. First-version POA&M now lists an owner, milestones and a target date for each open item; it is a lab document, not one prepared for a formal authorization package, and all items are Not started |
+| RA-3 | Risk Assessment | Findings triaged by location (own files vs base image) and severity; 15 risks rated on a simple likelihood-by-impact scale | `docs/risk-register-and-poam.md` | Partial. Ratings are my estimates on a lab app, with no asset owner or management review |
 
 ## Gaps this mapping exposes
 - Hardcoded `secret_key` (IA-5(7)): no scanner caught it. Fixed in Fix 7, but only a code review shows that; there is still no secrets manager.
 - Security headers (CM-6): 9 ZAP alerts open.
-- A formal POA&M and risk register (CA-5, RA-3): planned for Tier 2.
+- A formal POA&M and risk register (CA-5, RA-3): a first version exists in `docs/risk-register-and-poam.md`; the five POA&M items are not started.
 - Alert ownership and remediation deadlines (SI-2, CA-7): not defined.
 
 ## Limits

@@ -22,6 +22,9 @@ Findings in the files I own (app code, `requirements.txt`, `Dockerfile`): 22 bef
 
 The remaining 164 open alerts are all Trivy findings in the built image. Every row I reviewed is a Debian operating-system package in the `python:3.12-slim` base image (for example util-linux, tar, perl, ncurses, zlib). I did not plant them and my fixes cannot close them. See "Accepted risk" below.
 
+## Drift after the `v1-fixed` scan (2026-11-01)
+On 2026-11-01 the Security tab showed 177 open code scanning alerts (53 closed), up from 164, with no change to the application code. Alerts #218 to #230 (13) were opened after the `v1-fixed` scan. Every one I inspected (#218, #220 to #230) is a Trivy finding in the built image: SQLite (reported as "before 3.54.0") and one glibc finding, both operating-system packages in the base image. I did not open #219. The cause is Trivy's vulnerability database publishing new CVEs and the `python:3.12-slim` tag being rebuilt on each run. The 164 above is the snapshot at `v1-fixed`; it is not a live number. Findings in my own files stayed at 0.
+
 ## Fix log
 
 | Fix | Commit | Proof |

@@ -19,7 +19,7 @@ A small DevSecOps lab: a Flask app I wrote with security flaws planted on purpos
 - Mapped the pipeline to **14 NIST SP 800-53 Rev. 5 controls** with evidence, status and gaps.
 - Pinned every third-party Action to a commit SHA after the March 2026 compromise of the Trivy action's version tags.
 
-**Start here:** [Before and after](docs/before-and-after.md) · [Baseline findings](docs/baseline-findings.md) · [NIST 800-53 mapping](docs/nist-800-53-mapping.md) · [Workflow](.github/workflows/security-scan.yml)
+**Start here:** [Before and after](docs/before-and-after.md) · [Baseline findings](docs/baseline-findings.md) · [NIST 800-53 mapping](docs/nist-800-53-mapping.md) · [Risk register and POA&M](docs/risk-register-and-poam.md) · [Workflow](.github/workflows/security-scan.yml)
 
 > **About the flaws:** `v0-baseline` is the app with the flaws I planted (SQL injection, reflected XSS, hardcoded secret, debug mode, outdated dependencies, root container) so the scanners had something known to find. `main` has the fixes. Fictional data only. This is a lab app, not production software, so do not deploy it.
 
@@ -35,7 +35,7 @@ Scanned at tag `v0-baseline` (2026-10-28) and again at `v1-fixed` (2026-10-30). 
 | Trivy, built image | 187 | 164 |
 | Code scanning total (CodeQL + Trivy) | 209 | 164 |
 
-The 164 that remain are operating-system packages in the base image, which I did not plant and treat as accepted risk for this lab. Fix 7 (the hardcoded `secret_key`, commit `930deb9`) came after the `v1-fixed` scan. No scanner flagged that flaw, so it is proven by reading the code, not by a closed alert. Not fixed: the 9 ZAP header alerts.
+The 164 that remain are operating-system packages in the base image, which I did not plant and treat as accepted risk for this lab. The live count drifts upward without any code change: on 2026-11-01 it was 177 after Trivy's database added new base-image CVEs ([details](docs/before-and-after.md)). Fix 7 (the hardcoded `secret_key`, commit `930deb9`) came after the `v1-fixed` scan. No scanner flagged that flaw, so it is proven by reading the code, not by a closed alert. Not fixed: the 9 ZAP header alerts.
 
 ## Architecture
 
@@ -51,7 +51,8 @@ A change is pushed to GitHub, the three scan jobs run in GitHub Actions, and the
 - [x] Fixes made and rescanned, after counts recorded (6 fixes plus Fix 7 for the secret key): [docs/before-and-after.md](docs/before-and-after.md)
 - [x] NIST SP 800-53 mapping, first version (control titles verified, judgments under review): [docs/nist-800-53-mapping.md](docs/nist-800-53-mapping.md)
 - [x] Architecture diagram
-- [ ] Next: SonarQube beside CodeQL, a risk register and POA&M, security headers for the ZAP alerts, an API test against the OWASP API Top 10
+- [x] Risk register and POA&M, first version (15 risks, 5 open action items, none started): [docs/risk-register-and-poam.md](docs/risk-register-and-poam.md)
+- [ ] Next: pin the base image to a digest, security headers for the ZAP alerts, SonarQube beside CodeQL, an API test against the OWASP API Top 10
 
 ## What each tool does
 
