@@ -63,7 +63,7 @@ A change is pushed to GitHub, the three scan jobs run in GitHub Actions, and the
 
 | Stage | Tool | What it checks | Where results go |
 |---|---|---|---|
-| SCA, secrets, IaC, container image | Trivy (Aqua Security's open-source scanner) | Known CVEs in dependencies and the image, secrets, Dockerfile misconfiguration | GitHub Security tab (SARIF) |
+| SCA, secrets, IaC, container image | Trivy | Known CVEs in dependencies and the image, secrets, Dockerfile misconfiguration | GitHub Security tab (SARIF) |
 | SAST | CodeQL | Flaws in the Python source code | GitHub Security tab |
 | DAST (passive) | OWASP ZAP baseline | Missing security headers, cookie flags, information leaks on the running app | Workflow artifact (HTML, JSON, Markdown) |
 | SCA | Dependabot | Outdated or vulnerable libraries in `requirements.txt` | Dependabot alerts page |
