@@ -22,7 +22,7 @@ This maps what the pipeline and the fixes in this repo actually do to NIST SP 80
 | SA-10 | Developer Configuration Management | Git history with one change per commit and tags `v0-baseline` and `v1-fixed` marking before and after | `git log`, repo tags | Implemented. One person, no branch protection or review |
 | CA-7 | Continuous Monitoring | Scans run on every push and weekly | `schedule` cron in `security-scan.yml` | Partial. Alerts go to the Security tab only, with no owner or notification |
 | CA-5 | Plan of Action and Milestones | "What is not fixed" and "Accepted risk" sections track open items | `docs/before-and-after.md`, `docs/risk-register-and-poam.md` | Partial. First-version POA&M now lists an owner, milestones and a target date for each open item; it is a lab document, not one prepared for a formal authorization package, and all items are Not started |
-| RA-3 | Risk Assessment | Findings triaged by location (own files vs base image) and severity; 15 risks rated on a simple likelihood-by-impact scale | `docs/risk-register-and-poam.md` | Partial. Ratings are my estimates on a lab app, with no asset owner or management review |
+| RA-3 | Risk Assessment | Findings triaged by location (own files vs base image) and severity; 17 risks rated on a simple likelihood-by-impact scale | `docs/risk-register-and-poam.md` | Partial. Ratings are my estimates on a lab app, with no asset owner or management review |
 
 ## Gaps this mapping exposes
 - Hardcoded `secret_key` (IA-5(7)): no scanner caught it. Fixed in Fix 7, but only a code review shows that; there is still no secrets manager.

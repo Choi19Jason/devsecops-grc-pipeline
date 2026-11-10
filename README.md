@@ -6,18 +6,22 @@
 ![scanners](https://img.shields.io/badge/scanners-Trivy%20%7C%20CodeQL%20%7C%20ZAP%20%7C%20Dependabot-6f42c1)
 ![NIST](https://img.shields.io/badge/NIST%20800--53-14%20controls%20mapped-orange)
 
+**In plain English:** this project checks a small website for security mistakes automatically every time I change it. I made the mistakes on purpose, fixed them, and proved each fix by running the checks again.
+
 A small DevSecOps lab: a small Flask app (first version written with Claude Code) with security flaws planted on purpose, a GitHub Actions pipeline that scans it four ways, and a GRC layer that maps the pipeline to NIST SP 800-53. The loop is **scan, triage, fix, rescan, document**.
 
 **Author:** Joonwoo "Jason" Choi, CIT at Purdue (Class of 2028), targeting Summer 2027 AppSec, GRC and security internships.
 
-## TL;DR (what a reviewer should take away)
+## Summary
 
 - Built a **GitHub Actions** pipeline that runs **Trivy** (Aqua Security's open-source scanner), **CodeQL** (SAST) and **OWASP ZAP** (passive DAST) on every push and every Monday, with **Dependabot** watching the dependencies. Results go to the GitHub Security tab.
 - Fixed all **22 scanner-reported findings in my own files** (SQL injection, reflected XSS, debug mode, 17 outdated libraries, a root container) and proved each fix with a rescan. **Dependabot went from 17 to 0** and **CodeQL from 3 to 0**.
 - Found that **one of my own fixes made things worse**: upgrading pip added about 8 new alerts from pip's bundled libraries. I traced them and removed pip from the final image.
 - Recorded what the scanners **missed**: CodeQL and Trivy both skipped a hardcoded secret key (fixed by hand in Fix 7), and passive ZAP does not test for injection.
 - Mapped the pipeline to **14 NIST SP 800-53 Rev. 5 controls** with evidence, status and gaps.
-- Pinned every third-party Action to a commit SHA after the March 2026 compromise of the Trivy action's version tags.
+- Pinned every third-party Action to a commit SHA after the March 2026 compromise of the Trivy action's version tags ([GitHub advisory](https://github.com/aquasecurity/trivy/security/advisories/GHSA-69fq-xp46-6x23)).
+
+**How the numbers fit:** Fixes 1 to 6 closed the 22 scanner-reported findings (Fix 6 also removed alerts that Fix 5 had introduced). Fix 7 fixed a flaw no scanner reported, so it is not in the 22. The "7 fixes" badge counts all seven.
 
 **Start here:** [Before and after](docs/before-and-after.md) · [Baseline findings](docs/baseline-findings.md) · [NIST 800-53 mapping](docs/nist-800-53-mapping.md) · [Risk register and POA&M](docs/risk-register-and-poam.md) · [Workflow](.github/workflows/security-scan.yml)
 
@@ -72,7 +76,7 @@ A change is pushed to GitHub, the three scan jobs run in GitHub Actions, and the
 
 ## Honest limits
 
-- This uses Trivy, the open-source scanner from Aqua Security. It does not use Aqua's commercial platform. I have not used SonarQube, Jira, XBOW or Traceable.
+- This project uses free tools only. Trivy (from Aqua Security) and OWASP ZAP are open source; CodeQL and Dependabot are free GitHub features on public repositories. It does not use Aqua's commercial platform or other paid products.
 - ZAP baseline is passive: it does not attack the app, so it will not find the SQL injection. CodeQL covers that.
 - The target is a small demo app, not production code. Finding counts show that the pipeline works, not how secure a real system is.
 - The NIST mapping is a learning exercise, not a compliance assessment. Rows marked "closest fit" are debatable.
@@ -83,4 +87,4 @@ I am new to application security and used Claude Code (an AI coding assistant) a
 
 ## Supply-chain note
 
-Every third-party action in `.github/workflows/security-scan.yml` is pinned to a full commit SHA instead of a tag. In March 2026 the `aquasecurity/trivy-action` version tags were force-pushed to malicious code; a pinned SHA cannot be moved that way.
+Every third-party action in `.github/workflows/security-scan.yml` is pinned to a full commit SHA instead of a tag. In March 2026 the `aquasecurity/trivy-action` version tags were force-pushed to malicious code; a pinned SHA cannot be moved that way. Sources: [GitHub security advisory GHSA-69fq-xp46-6x23](https://github.com/aquasecurity/trivy/security/advisories/GHSA-69fq-xp46-6x23) and [Snyk's write-up](https://snyk.io/articles/trivy-github-actions-supply-chain-compromise/). Sources differ slightly on how many tags were affected, so this README gives no count.
